@@ -1,11 +1,17 @@
-FROM itzg/minecraft-server
+# Use uma imagem base com Java
+FROM openjdk:17-jdk-slim
 
-WORKDIR /app
+# Defina o diretório de trabalho no contêiner
+WORKDIR /minecraft
 
-COPY whitelist.json /data
+# Baixe o servidor oficial do Minecraft
+ADD https://launcher.mojang.com/v1/objects/7b3f365cb07fb2978cd3c5f432c0d7ed1b649c76/server.jar server.jar
 
-COPY build-info.sh /opt
+# Aceite automaticamente o EULA do Minecraft
+RUN echo "eula=true" > eula.txt
 
-RUN apt-get install jq && /opt/build-info.sh
-
+# Exponha a porta padrão do servidor Minecraft
 EXPOSE 25565
+
+# Comando para iniciar o servidor Minecraft
+CMD ["java", "-Xmx1024M", "-Xms1024M", "-jar", "server.jar", "nogui"]
