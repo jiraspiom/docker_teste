@@ -1,15 +1,20 @@
-# Use uma imagem base mínima com Python
-FROM python:3.9-slim
+FROM ubuntu:22.04
 
-# Instale o servidor HTTP básico
-RUN pip install flask
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Copie o código da aplicação para o contêiner
-WORKDIR /app
-COPY . .
+WORKDIR /minecraft
 
-# Exponha a porta que o servidor usará
-EXPOSE 5000
+RUN apt-get update && apt-get install -y \
+    openjdk-17-jdk \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
-# Comando para rodar o servidor
-CMD ["python", "app.py"]
+RUN wget -O server.jar https://piston-data.mojang.com/v1/objects/4fb536bfd4a83d61cdbaf684b8d311e66e7d4c49/server.jar
+
+RUN echo "eula=true" > eula.txt
+
+EXPOSE 25565
+
+ENTRYPOINT [ "java" ] 
+
+CMD ["-Xmx1024M", "-Xms1024M", "-jar", "server.jar", "nogui" ]
